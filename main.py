@@ -4,6 +4,7 @@ import pygame
 import sys
 import config # Import the config module
 import shapes
+import random as r
 
 def init_game ():
     pygame.init()
@@ -21,16 +22,7 @@ def draw_text(screen, font_pose, text='No text', font_size=10, font_name='DejaVu
     screen.blit(img, font_pose)
 
 def handle_events (button):
-    for events in pygame.event.get():
-        if events.type == pygame.QUIT:
-            return False
-        if events.type == pygame.MOUSEBUTTONDOWN:
-            if button.collidepoint(events.pos):
-                pygame.quit()
-                sys.exit()
-        elif events.type == pygame.KEYDOWN:
-            if events.key == pygame.K_ESCAPE:
-                return False
+
     return True
 def main():
     screen = init_game()
@@ -39,27 +31,40 @@ def main():
     font = pygame.font.SysFont('Georgia', 40, bold=True)
     surf = font.render('Button', True, config.BLACK)
 
+    button_clr = (110,110,110)
     button_length = 200
     button_width = 60
     button_x = 300
     button_y = 125
     button = pygame.Rect(button_x,button_y,button_length,button_width)
 
-    surf_rect = surf.get_rect()
-    surf_rect.center = button.center
+    
 
     running = True
     while running:
-        running = handle_events(button)
         screen.fill(config.WHITE) # Use color from config
-        
-        mouse_x, mouse_y = pygame.mouse.get_pos()
+        for events in pygame.event.get():
+            if events.type == pygame.QUIT:
+                running = False
+            if events.type == pygame.MOUSEBUTTONDOWN:
+                if button.collidepoint(events.pos):
+                    button_x = r.randint(0,config.WINDOW_WIDTH-button_length)
+                    button_y = r.randint(0,config.WINDOW_HEIGHT-button_width)
+                    button_color = (r.randint(0,255),r.randint(0,255),r.randint(0,255))
+                    button_clr = button_color
+            elif events.type == pygame.KEYDOWN:
+                if events.key == pygame.K_ESCAPE:
+                    running = False
+            mouse_x, mouse_y = pygame.mouse.get_pos()
 
         if button.collidepoint(mouse_x, mouse_y):
-            button_color = (180,180,180)
+            button_color = (r.randint(0,255),r.randint(0,255),r.randint(0,255))
         else:
-            button_color = (110,110,110)
+            button_color = button_clr
 
+        button = pygame.Rect(button_x,button_y,button_length,button_width)
+        surf_rect = surf.get_rect()
+        surf_rect.center = button.center
         pygame.draw.rect(screen, button_color, button)
 
         screen.blit(surf,surf_rect)
